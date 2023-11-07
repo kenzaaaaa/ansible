@@ -1,0 +1,72 @@
+---
+- name: Deploy docker containers on Staging server
+  hosts: stage_server
+  become: yes
+  tasks:
+
+    # Deploying docker container
+    - name: Deploy App instance 1
+      # Using the community.docker.docker_container Ansible module
+      community.docker.docker_container:
+        name: app-instance-1
+        image: kenzaaaaa/my-node-app:0.5.RELEASE
+        restart_policy: always
+        ports: 81:8181
+        env:
+          APP_ENV: "{{ APP_ENV }}"
+          TUNING: "{{ TUNING }}"
+          DEBUG: "{{ DEBUG }}"
+          EXTERNAL_URL: "{{ EXTERNAL_URL }}"
+          CLIENT: "{{ CLIENT }}"
+          INTERACTION_MODE: "{{ INTERACTION_MODE }}"
+          DEVICE_ID: "{{ DEVICE_ID }}"
+        memory: 1G
+        cpus: 0.3
+        # storage_opts:
+        #   size: 5G
+        volumes:
+          - secret-keys-volume:/app/
+
+    - name: Deploy App instance 2
+      # Using the community.docker.docker_container Ansible module
+      community.docker.docker_container:
+        name: app-instance-2
+        image: kenzaaaaa/my-node-app:0.5.RELEASE
+        restart_policy: always
+        ports: 82:8181
+        env:
+          APP_ENV: "{{ APP_ENV }}"
+          TUNING: "{{ TUNING }}"
+          DEBUG: "{{ DEBUG }}"
+          EXTERNAL_URL: "{{ EXTERNAL_URL }}"
+          CLIENT: "{{ CLIENT }}"
+          INTERACTION_MODE: "{{ INTERACTION_MODE }}"
+          DEVICE_ID: "{{ DEVICE_ID }}"
+        memory: 1G
+        cpus: 0.3
+        # storage_opts:
+        #   size: 5G
+        volumes:
+          - secret-keys-volume:/app/
+
+    - name: Deploy App instance 3
+      # Using the community.docker.docker_container Ansible module
+      community.docker.docker_container:
+        name: app-instance-3
+        image: kenzaaaaa/my-node-app:0.5.RELEASE
+        restart_policy: always
+        ports: 83:8181
+        env:
+          APP_ENV: "{{ APP_ENV }}"
+          TUNING: "{{ TUNING }}"
+          DEBUG: "{{ DEBUG }}"
+          EXTERNAL_URL: "{{ EXTERNAL_URL }}"
+          CLIENT: "{{ CLIENT }}"
+          INTERACTION_MODE: "{{ INTERACTION_MODE }}"
+          DEVICE_ID: "{{ DEVICE_ID }}"
+        memory: 1G
+        cpus: 0.3
+        # storage_opts:
+        #   size: 5G
+        volumes:
+          - secret-keys-volume:/app/

@@ -1,0 +1,81 @@
+---
+- name: Install docker on Amazon Linux 2
+  hosts: all
+  # Using elevated privilege
+  become: yes
+  tasks:
+
+    # Updates all packages on the target host by using the yum module
+    - name: Update all packages
+      # This step specifies using the yum ansible module
+      yum:
+        # When using state=latest, this can be '*' which means run yum -y update.
+        # Package name - means update all packages
+        name: '*'
+        # To their latest version
+        state: latest
+        # Just do the update, no installations
+        update_only: yes
+
+    # Installs the specified yum packages by using the yum module
+    - name: Install a list of yum packages
+      yum:
+        # Specifies the list of packages to be installed. Packages are defined below in the packages variable
+        name: "{{ packages }}"
+        # Update packages to latest version
+        state: latest
+        # Update package cache before checking for updates or new installations to make sure Ansible is working with the most up-to-date package information
+        update_cache: yes
+      vars:
+        packages:
+        - python-pip
+        - yum-utils
+        - device-mapper-persistent-data
+        - lvm2
+        - amazon-linux-extras
+
+    # Enabling additional packages not included in the base repository
+    - name: Add/enable extras repository
+      shell: yum-config-manager --enable extras
+
+    - name: Enable some packages from amazon-linux-extras packages
+      shell: "amazon-linux-extras enable python3.8 ansible2 docker"
+
+    - name: clean yum metadata cache
+      command: yum clean metadata
+
+    - name: Install another list of yum packages
+      yum:
+        name: "{{ packages }}"
+        state: latest
+        update_cache: yes
+      vars:
+        packages:
+        - python3.8
+        - ansible
+        - docker
+
+    - name: Enable Docker CE service at startup
+      # Using Ansible service module to manage system services
+      service:
+        # Ensures that the docker service is started at system boot
+        name: docker
+        state: started
+        enabled: yes
+
+    # Uses Ansible shell module to execute a shell command that upgrades pip to the latest version using the Python 3.8 interpreter.
+    # This step ensures that pip3 is up to date for installed the python packages in the next step
+    - name: Upgrade pip3
+      shell: "python3.8 -m pip install pip --upgrade"
+
+
+    - name: Install Python pip packages
+      pip:
+        name: "{{ packages }}"
+        # This parameter specifies the path to pip3.8 executable, ensuring that pacakges are installed using this specific pip version
+        executable: /usr/local/bin/pip3.8
+      vars:
+        packages:
+        - boto
+        - boto3
+        - docker-compose
